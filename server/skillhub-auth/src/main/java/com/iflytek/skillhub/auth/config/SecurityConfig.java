@@ -103,7 +103,7 @@ public class SecurityConfig {
         RequestMatcher csrfIgnoreMatcher = request -> {
             String path = request.getRequestURI();
             String authorization = request.getHeader("Authorization");
-            return routeSecurityPolicyRegistry.shouldIgnoreCsrf(path, authorization);
+            return routeSecurityPolicyRegistry.shouldIgnoreCsrf(request.getMethod(), path, authorization);
         };
 
         http

@@ -6,6 +6,7 @@ DEV_WEB_PID := $(DEV_DIR)/web.pid
 DEV_SERVER_LOG := $(DEV_DIR)/server.log
 DEV_WEB_LOG := $(DEV_DIR)/web.log
 DEV_WEB_URL := http://localhost:3000
+DEV_WEB_HOST ?= 127.0.0.1
 DEV_API_URL := http://localhost:8080
 DEV_SCANNER_URL := http://localhost:8000
 STAGING_API_URL := http://localhost:8080
@@ -48,7 +49,7 @@ dev-all: ## 一键启动本地开发环境（依赖 + scanner + 后端 + 前端�
 		echo "Frontend already running with PID $$(cat $(DEV_WEB_PID))"; \
 	else \
 		echo "Starting frontend..."; \
-		$(DEV_PROCESS) start --pid-file $(DEV_WEB_PID) --log-file $(DEV_WEB_LOG) --cwd web -- pnpm exec vite --host 0.0.0.0 --strictPort >/dev/null; \
+		$(DEV_PROCESS) start --pid-file $(DEV_WEB_PID) --log-file $(DEV_WEB_LOG) --cwd web -- pnpm exec vite --host $(DEV_WEB_HOST) --strictPort >/dev/null; \
 	fi
 	@echo "Waiting for backend on $(DEV_API_URL) ..."
 	@backend_ready=0; \
@@ -237,7 +238,7 @@ web-install-ci: ## 以 CI 方式安装前端依赖
 	cd web && CI=true pnpm install --frozen-lockfile
 
 dev-web: ## 启动前端开发服务器
-	cd web && pnpm run dev
+	cd web && pnpm exec vite --host $(DEV_WEB_HOST)
 
 build-frontend: web-deps ## 构建前端
 	cd web && pnpm run build

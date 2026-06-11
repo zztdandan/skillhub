@@ -113,10 +113,15 @@ class RouteSecurityPolicyRegistryTest {
     }
 
     @Test
-    void shouldIgnoreCsrf_forBearerAndApiPaths() {
-        assertTrue(registry.shouldIgnoreCsrf("/api/v1/admin/users", null));
-        assertTrue(registry.shouldIgnoreCsrf("/not-api", "Bearer token"));
-        assertFalse(registry.shouldIgnoreCsrf("/ui/settings", null));
+    void shouldIgnoreCsrf_onlyForBearerTokensAndDeviceTokenFlow() {
+        assertFalse(registry.shouldIgnoreCsrf("POST", "/api/v1/admin/users", null));
+        assertFalse(registry.shouldIgnoreCsrf("POST", "/api/v1/auth/local/change-password", null));
+        assertTrue(registry.shouldIgnoreCsrf("POST", "/not-api", "Bearer token"));
+        assertTrue(registry.shouldIgnoreCsrf("POST", "/api/v1/auth/device/code", null));
+        assertTrue(registry.shouldIgnoreCsrf("POST", "/api/v1/auth/device/token", null));
+        assertFalse(registry.shouldIgnoreCsrf("GET", "/api/v1/auth/device/code", null));
+        assertFalse(registry.shouldIgnoreCsrf("POST", "/api/v1/auth/device/authorize", null));
+        assertFalse(registry.shouldIgnoreCsrf("POST", "/ui/settings", null));
     }
 
     @Test

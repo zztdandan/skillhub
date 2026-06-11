@@ -18,7 +18,7 @@ skillhub:
   security:
     scanner:
       # 基础配置
-      enabled: ${SKILLHUB_SECURITY_SCANNER_ENABLED:false}
+      enabled: ${SKILLHUB_SECURITY_SCANNER_ENABLED:true}
       base-url: ${SKILLHUB_SECURITY_SCANNER_URL:http://localhost:8000}
       mode: ${SKILLHUB_SECURITY_SCANNER_MODE:local}
 

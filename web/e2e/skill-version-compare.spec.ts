@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { setEnglishLocale } from './helpers/auth-fixtures'
+import { csrfHeaders } from './helpers/csrf'
 import { loginWithCredentials, registerSession } from './helpers/session'
 import { E2eTestDataBuilder } from './helpers/test-data-builder'
 
@@ -50,6 +51,7 @@ test.describe('Skill Version Compare (Real API)', () => {
             targetVersion: '1.1.0',
             confirmWarnings: true,
           },
+          headers: await csrfHeaders(page),
         }
       )
       expect(rereleaseResponse.ok()).toBe(true)

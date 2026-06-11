@@ -198,6 +198,32 @@ class LocalAuthControllerTest {
     }
 
     @Test
+    void changePassword_withAuthentication_withInvalidCsrf_returnsForbidden() throws Exception {
+        PlatformPrincipal principal = new PlatformPrincipal(
+            "usr_3",
+            "carol",
+            "carol@example.com",
+            "",
+            "local",
+            Set.of("SUPER_ADMIN")
+        );
+        var auth = new UsernamePasswordAuthenticationToken(
+            principal,
+            null,
+            List.of(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN"))
+        );
+
+        mockMvc.perform(post("/api/v1/auth/local/change-password")
+                .with(authentication(auth))
+                .with(csrf().useInvalidToken())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"currentPassword":"old","newPassword":"Newpass123!"}
+                    """))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
     void requestPasswordReset_returnsGenericSuccessEnvelope() throws Exception {
         mockMvc.perform(post("/api/v1/auth/local/password-reset/request")
                 .with(csrf())

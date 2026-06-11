@@ -1,6 +1,7 @@
 package com.iflytek.skillhub.ratelimit;
 
 import com.iflytek.skillhub.config.DownloadRateLimitProperties;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 public class AnonymousDownloadIdentityService {
 
     private static final String COOKIE_VERSION = "v1";
+    private static final int MIN_SECRET_LENGTH = 32;
     private static final SecureRandom RANDOM = new SecureRandom();
 
     private final DownloadRateLimitProperties properties;
@@ -33,6 +35,20 @@ public class AnonymousDownloadIdentityService {
                                             ClientIpResolver clientIpResolver) {
         this.properties = properties;
         this.clientIpResolver = clientIpResolver;
+    }
+
+    @PostConstruct
+    void validateAnonymousCookieSecret() {
+        String secret = properties.getAnonymousCookieSecret();
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException("SKILLHUB_DOWNLOAD_ANON_COOKIE_SECRET is required");
+        }
+        if ("change-me-in-production".equals(secret)) {
+            throw new IllegalStateException("SKILLHUB_DOWNLOAD_ANON_COOKIE_SECRET must not use the default placeholder");
+        }
+        if (secret.length() < MIN_SECRET_LENGTH) {
+            throw new IllegalStateException("SKILLHUB_DOWNLOAD_ANON_COOKIE_SECRET must be at least 32 characters");
+        }
     }
 
     public AnonymousDownloadIdentity resolve(HttpServletRequest request, HttpServletResponse response) {
